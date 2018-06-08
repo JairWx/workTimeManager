@@ -8,104 +8,38 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import com.wtm.db.TaskDB;
+import com.wtm.domain.Task;
+import com.wtm.frame.ClockFrame;
 import com.wtm.frame.NoticeFrame;
+import com.wtm.timertask.NoticeTimerTask;
 
-public class NoticeTask extends TimerTask {
+public class NoticeTask{
 	
-	
-	private int sethour;  
-	private int setminute;  
-	private int setsecond;
-	
-	private int settime = 60000;
-	
-	private Calendar setCalendar;
-	
-	private long timeRemaing = 0;
-	
-	private String taskerTitile = "";
-    
-	public NoticeTask(String title){
-		this.taskerTitile = title;
-	}
-	
-    public void setTimer(int sethour,int setminute,int setsecond){
-    	this.sethour = sethour;
-    	this.setminute = setminute;
-    	this.setsecond = setsecond;
-    }
-    
-    
-	public Calendar getSetCalendar() {
-		return setCalendar;
-	}
-
-	public void setSetCalendar(Calendar setCalendar) {
-		this.setCalendar = setCalendar;
-	}
-
-	public String getTaskerTitile() {
-		return taskerTitile;
-	}
-
-
-
-	public long getTimeRemaing() {
-		return timeRemaing;
-	}
-
-	public void setTimeRemaing(long timeRemaing) {
-		this.timeRemaing = timeRemaing;
-	}
-
-	public void setTaskerTitile(String taskerTitile) {
-		this.taskerTitile = taskerTitile;
-	}
-
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		GregorianCalendar calendar = new GregorianCalendar();  
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);  
-        int minute = calendar.get(Calendar.MINUTE);  
-        int second = calendar.get(Calendar.SECOND);  
-        //计算间隔时间
-        if(setCalendar != null) {
-        	 this.timeRemaing = setCalendar.getTimeInMillis() - calendar.getTimeInMillis();
-        }
-        if(sethour == hour && setminute == minute && setsecond == second){  
-            //playMusic(file);  
-        	NoticeFrame n1 = new NoticeFrame();
-        	n1.setContentPane(new JLabel(taskerTitile));
-        	n1.setVisible(true);
-            try {
-				Thread.sleep(settime);
-				//n1.setUndecorated(false);
-				//SwingUtilities.updateComponentTreeUI(n1);
-				n1.addMouseListener(new MouseAdapter() {
-
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						// TODO Auto-generated method stub
-						n1.setVisible(false);
-					}
-					
-				});
-				setCalendar = null;
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-          }  
+	public NoticeTask(String title,ClockFrame  f){
+		//插入记录
+		Calendar now = Calendar.getInstance(); 
+   	 now.add(Calendar.MINUTE, 25);
+   	 int sethour = now.get(Calendar.HOUR_OF_DAY);
+        int setminute = now.get(Calendar.MINUTE);
+        int setsecond = now.get(Calendar.SECOND); 
+        NoticeTimerTask task2 = new NoticeTimerTask(title); 
+        task2.setClockFrame(f);
+        task2.setSetCalendar(now);
+        task2.setTimer(sethour, setminute, setsecond);
+        Timer t = new Timer();  
+        t.schedule(task2, 0, 1000);//每秒刷新一次  
+        System.out.println(new StringBuffer(sethour).append(sethour).append(":").append(setminute).append(":").append(setsecond));
 	}
 
 }
